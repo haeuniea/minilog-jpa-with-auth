@@ -43,6 +43,11 @@ dependencies {
 	// MySQL JDBC 드라이버 의존성 추가
 	implementation 'mysql:mysql-connector-java:8.0.32'
 
+	// Spring Security와 JWT 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// JWT 라이브러리를 추가
+	implementation 'io.jsonwebtoken::jjwt-api:0.11.5'
+
 	// Lombok 라이브러리를 컴파일 시에만 사용하도록 설정 (Getter, Setter 등을 자동으로 생성)
 	compileOnly 'org.projectlombok:lombok'
 	// Lombok이 제공하는 기능을 사용하기 위한 애노테이션 프로세서 추가
@@ -50,6 +55,9 @@ dependencies {
 
 	// JUnit 5를 이용한 테스트를 위한 의존성 추가
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+
+	// Spring Security 테스트를 위한 의존성 추가
+	testImplementation 'org.springframework.security:spring-security-test'
 
 	// Import TestContainers for JUnit 5
 	// 임시 MySQL 컨테이너를 생성하여 유닛테스트를 수행하기 위한 의존성 추가
@@ -59,6 +67,8 @@ dependencies {
 
 	// JUnit 5 테스트를 실행하기 위한 런타임 의존성 추가
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// JWT 라이브러리의 구현체 추가
 }
 
 // 테스트 태스크를 구성
