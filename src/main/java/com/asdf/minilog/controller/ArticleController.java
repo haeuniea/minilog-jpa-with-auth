@@ -2,6 +2,7 @@ package com.asdf.minilog.controller;
 
 import com.asdf.minilog.dto.ArticleRequestDto;
 import com.asdf.minilog.dto.ArticleResponseDto;
+import com.asdf.minilog.security.MinilogUserDetails;
 import com.asdf.minilog.service.ArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/article")
+@RequestMapping("/api/v2/article")
 public class ArticleController {
 
     private final ArticleService articleService;
@@ -37,10 +39,10 @@ public class ArticleController {
         @ApiResponse(responseCode = "404", description = "사용자 없음")
     })
     public ResponseEntity<ArticleResponseDto> createArticle(
+            @AuthenticationPrincipal MinilogUserDetails userDetails,
             @RequestBody ArticleRequestDto article) {
-        Long userId = article.getAuthorId();
         ArticleResponseDto createdArticle =
-                articleService.createArticle(article.getContent(), userId);
+                articleService.createArticle(article.getContent(), userDetails.getId());
         return ResponseEntity.ok(createdArticle);
     }
 
@@ -62,8 +64,9 @@ public class ArticleController {
         @ApiResponse(responseCode = "404", description = "포스트 없음")
     })
     public ResponseEntity<ArticleResponseDto> updateArticle(
+            @AuthenticationPrincipal MinilogUserDetails userDetails,
             @PathVariable Long articleId, @RequestBody ArticleRequestDto article) {
-        var updatedArticle = articleService.updateArticle(articleId, article.getContent());
+        ArticleResponseDto updatedArticle = articleService.updateArticle(userDetails.getId(), articleId, article.getContent());
         return ResponseEntity.ok(updatedArticle);
     }
 
@@ -73,8 +76,10 @@ public class ArticleController {
         @ApiResponse(responseCode = "204", description = "삭제됨"),
         @ApiResponse(responseCode = "404", description = "포스트 없음")
     })
-    public ResponseEntity<Void> deleteArticle(@PathVariable Long articleId) {
-        articleService.deleteArticle(articleId);
+    public ResponseEntity<Void> deleteArticle(
+            @AuthenticationPrincipal MinilogUserDetails userDetails,
+            @PathVariable Long articleId) {
+        articleService.deleteArticle(userDetails.getId(), articleId);
         return ResponseEntity.noContent().build();
     }
 
