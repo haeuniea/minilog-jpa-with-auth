@@ -65,8 +65,10 @@ public class ArticleController {
     })
     public ResponseEntity<ArticleResponseDto> updateArticle(
             @AuthenticationPrincipal MinilogUserDetails userDetails,
-            @PathVariable Long articleId, @RequestBody ArticleRequestDto article) {
-        ArticleResponseDto updatedArticle = articleService.updateArticle(userDetails.getId(), articleId, article.getContent());
+            @PathVariable Long articleId,
+            @RequestBody ArticleRequestDto article) {
+        ArticleResponseDto updatedArticle =
+                articleService.updateArticle(userDetails.getId(), articleId, article.getContent());
         return ResponseEntity.ok(updatedArticle);
     }
 
@@ -77,8 +79,7 @@ public class ArticleController {
         @ApiResponse(responseCode = "404", description = "포스트 없음")
     })
     public ResponseEntity<Void> deleteArticle(
-            @AuthenticationPrincipal MinilogUserDetails userDetails,
-            @PathVariable Long articleId) {
+            @AuthenticationPrincipal MinilogUserDetails userDetails, @PathVariable Long articleId) {
         articleService.deleteArticle(userDetails.getId(), articleId);
         return ResponseEntity.noContent().build();
     }

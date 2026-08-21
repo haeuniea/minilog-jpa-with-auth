@@ -32,17 +32,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockitoBean
-    private UserService userService;
+    @MockitoBean private UserService userService;
 
-    @MockitoBean
-    private JwtRequestFilter jwtRequestFilter;
+    @MockitoBean private JwtRequestFilter jwtRequestFilter;
 
-    @MockitoBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @MockitoBean private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @MockitoBean(name = "jpaMappingContext")
     private JpaMetamodelMappingContext jpaMappingContext;
@@ -56,38 +52,25 @@ public class UserControllerTest {
                         1L,
                         "testuser",
                         "password",
-                        List.of(
-                                () -> "ROLE_AUTHOR",
-                                () -> "ROLE_ADMIN"));
+                        List.of(() -> "ROLE_AUTHOR", () -> "ROLE_ADMIN"));
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                        userDetails, null, userDetails.getAuthorities());
 
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
     public void testGetUsers() throws Exception {
         List<UserResponseDto> userResponseDtoList =
                 List.of(
-                        UserResponseDto.builder()
-                                .id(1L)
-                                .username("testuser")
-                                .build(),
-                        UserResponseDto.builder()
-                                .id(2L)
-                                .username("Test User 2")
-                                .build());
+                        UserResponseDto.builder().id(1L).username("testuser").build(),
+                        UserResponseDto.builder().id(2L).username("Test User 2").build());
 
-        when(userService.getUsers())
-                .thenReturn(userResponseDtoList);
+        when(userService.getUsers()).thenReturn(userResponseDtoList);
 
-        mockMvc
-                .perform(get("/api/v2/user"))
+        mockMvc.perform(get("/api/v2/user"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -99,16 +82,11 @@ public class UserControllerTest {
     @Test
     public void testGetUserById() throws Exception {
         UserResponseDto userResponseDto =
-                UserResponseDto.builder()
-                        .id(1L)
-                        .username("testuser")
-                        .build();
+                UserResponseDto.builder().id(1L).username("testuser").build();
 
-        when(userService.getUserById(anyLong()))
-                .thenReturn(Optional.of(userResponseDto));
+        when(userService.getUserById(anyLong())).thenReturn(Optional.of(userResponseDto));
 
-        mockMvc
-                .perform(get("/api/v2/user/1"))
+        mockMvc.perform(get("/api/v2/user/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
@@ -118,27 +96,17 @@ public class UserControllerTest {
     @Test
     public void testCreateUser() throws Exception {
         UserRequestDto userRequestDto =
-                UserRequestDto.builder()
-                        .username("testuser")
-                        .password("password")
-                        .build();
+                UserRequestDto.builder().username("testuser").password("password").build();
 
         UserResponseDto userResponseDto =
-                UserResponseDto.builder()
-                        .id(1L)
-                        .username("testuser")
-                        .build();
+                UserResponseDto.builder().id(1L).username("testuser").build();
 
-        when(userService.createUser(any(UserRequestDto.class)))
-                .thenReturn(userResponseDto);
+        when(userService.createUser(any(UserRequestDto.class))).thenReturn(userResponseDto);
 
-        mockMvc
-                .perform(
+        mockMvc.perform(
                         post("/api/v2/user")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        objectMapper.writeValueAsString(
-                                                userRequestDto)))
+                                .content(objectMapper.writeValueAsString(userRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
@@ -148,30 +116,19 @@ public class UserControllerTest {
     @Test
     public void testUpdateUser() throws Exception {
         UserRequestDto userRequestDto =
-                UserRequestDto.builder()
-                        .username("testuser")
-                        .password("password")
-                        .build();
+                UserRequestDto.builder().username("testuser").password("password").build();
 
         UserResponseDto userResponseDto =
-                UserResponseDto.builder()
-                        .id(1L)
-                        .username("testuser")
-                        .build();
+                UserResponseDto.builder().id(1L).username("testuser").build();
 
         when(userService.updateUser(
-                any(MinilogUserDetails.class),
-                anyLong(),
-                any(UserRequestDto.class)))
+                        any(MinilogUserDetails.class), anyLong(), any(UserRequestDto.class)))
                 .thenReturn(userResponseDto);
 
-        mockMvc
-                .perform(
+        mockMvc.perform(
                         put("/api/v2/user/1")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        objectMapper.writeValueAsString(
-                                                userRequestDto)))
+                                .content(objectMapper.writeValueAsString(userRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
@@ -180,20 +137,15 @@ public class UserControllerTest {
 
     @Test
     public void testDeleteUser() throws Exception {
-        mockMvc
-                .perform(delete("/api/v2/user/1"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v2/user/1")).andExpect(status().isNoContent());
     }
 
     @Test
     public void testGlobalExceptionHandler() throws Exception {
         when(userService.getUserById(anyLong()))
-                .thenThrow(
-                        new UserNotFoundException(
-                                "Test Exception"));
+                .thenThrow(new UserNotFoundException("Test Exception"));
 
-        mockMvc
-                .perform(get("/api/v2/user/999"))
+        mockMvc.perform(get("/api/v2/user/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Test Exception"));
     }

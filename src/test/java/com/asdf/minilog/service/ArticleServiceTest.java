@@ -112,7 +112,8 @@ public class ArticleServiceTest {
     @Test
     @Transactional
     void testGetArticleListByUserId() {
-        ArticleResponseDto article = articleService.getArticleListByUserId(user1.getId()).getFirst();
+        ArticleResponseDto article =
+                articleService.getArticleListByUserId(user1.getId()).getFirst();
 
         assertThat(article.getArticleId()).isEqualTo(article1.getId());
         assertThat(article.getContent()).isEqualTo(article1.getContent());

@@ -32,47 +32,34 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 public class ArticleControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockitoBean
-    private ArticleService articleService;
+    @MockitoBean private ArticleService articleService;
 
-    @MockitoBean
-    private JwtRequestFilter jwtRequestFilter;
+    @MockitoBean private JwtRequestFilter jwtRequestFilter;
 
-    @MockitoBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @MockitoBean private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @MockitoBean(name = "jpaMappingContext")
     private JpaMetamodelMappingContext jpaMappingContext;
 
-    private final LocalDateTime fixtureDateTime =
-            LocalDateTime.of(2025, 1, 1, 0, 0, 0);
+    private final LocalDateTime fixtureDateTime = LocalDateTime.of(2025, 1, 1, 0, 0, 0);
 
     private final DateTimeFormatter formatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    private final String formattedFixtureDateTime =
-            fixtureDateTime.format(formatter);
+    private final String formattedFixtureDateTime = fixtureDateTime.format(formatter);
 
     @BeforeEach
     void setUp() {
         MinilogUserDetails userDetails =
-                new MinilogUserDetails(
-                        1L,
-                        "testuser",
-                        "password",
-                        List.of(() -> "ROLE_AUTHOR"));
+                new MinilogUserDetails(1L, "testuser", "password", List.of(() -> "ROLE_AUTHOR"));
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                        userDetails, null, userDetails.getAuthorities());
 
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
@@ -86,13 +73,13 @@ public class ArticleControllerTest {
                         .createdAt(fixtureDateTime)
                         .build();
 
-        when(articleService.createArticle(any(), anyLong()))
-                .thenReturn(responseDto);
+        when(articleService.createArticle(any(), anyLong())).thenReturn(responseDto);
 
         mockMvc.perform(
                         post("/api/v2/article")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("""
+                                .content(
+                                        """
                                         {
                                           "content": "Test Content"
                                         }
@@ -111,8 +98,7 @@ public class ArticleControllerTest {
                         .createdAt(fixtureDateTime)
                         .build();
 
-        when(articleService.getArticleById(anyLong()))
-                .thenReturn(responseDto);
+        when(articleService.getArticleById(anyLong())).thenReturn(responseDto);
 
         mockMvc.perform(get("/api/v2/article/1"))
                 .andExpect(status().isOk())
@@ -120,9 +106,7 @@ public class ArticleControllerTest {
                 .andExpect(jsonPath("$.content").value("Test Content"))
                 .andExpect(jsonPath("$.authorId").value(1L))
                 .andExpect(jsonPath("$.authorName").value("testuser"))
-                .andExpect(
-                        jsonPath("$.createdAt")
-                                .value(formattedFixtureDateTime));
+                .andExpect(jsonPath("$.createdAt").value(formattedFixtureDateTime));
     }
 
     @Test
@@ -136,16 +120,13 @@ public class ArticleControllerTest {
                         .createdAt(fixtureDateTime)
                         .build();
 
-        when(articleService.updateArticle(
-                any(),
-                anyLong(),
-                any()))
-                .thenReturn(responseDto);
+        when(articleService.updateArticle(any(), anyLong(), any())).thenReturn(responseDto);
 
         mockMvc.perform(
                         put("/api/v2/article/1")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("""
+                                .content(
+                                        """
                                         {
                                           "content": "Updated Content"
                                         }
@@ -155,8 +136,7 @@ public class ArticleControllerTest {
 
     @Test
     public void testDeleteArticle() throws Exception {
-        mockMvc.perform(delete("/api/v2/article/1"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v2/article/1")).andExpect(status().isNoContent());
     }
 
     @Test
@@ -173,31 +153,23 @@ public class ArticleControllerTest {
                         .createdAt(fixtureDateTime)
                         .build();
 
-        List<ArticleResponseDto> responseList =
-                Collections.singletonList(responseDto);
+        List<ArticleResponseDto> responseList = Collections.singletonList(responseDto);
 
-        when(articleService.getArticleListByUserId(anyLong()))
-                .thenReturn(responseList);
+        when(articleService.getArticleListByUserId(anyLong())).thenReturn(responseList);
 
-        mockMvc.perform(
-                        get("/api/v2/article")
-                                .param("authorId", "1"))
+        mockMvc.perform(get("/api/v2/article").param("authorId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].articleId").value(articleId))
                 .andExpect(jsonPath("$[0].content").value("Test Content"))
                 .andExpect(jsonPath("$[0].authorId").value(userId))
                 .andExpect(jsonPath("$[0].authorName").value("testuser"))
-                .andExpect(
-                        jsonPath("$[0].createdAt")
-                                .value(formattedFixtureDateTime));
+                .andExpect(jsonPath("$[0].createdAt").value(formattedFixtureDateTime));
     }
 
     @Test
     public void testGlobalExceptionHandler() throws Exception {
         when(articleService.getArticleById(anyLong()))
-                .thenThrow(
-                        new ArticleNotFoundException(
-                                "Article Not Found"));
+                .thenThrow(new ArticleNotFoundException("Article Not Found"));
 
         mockMvc.perform(get("/api/v2/article/999"))
                 .andExpect(status().isNotFound())

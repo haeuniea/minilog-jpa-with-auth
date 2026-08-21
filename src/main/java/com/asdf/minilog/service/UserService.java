@@ -9,7 +9,6 @@ import com.asdf.minilog.exception.UserNotFoundException;
 import com.asdf.minilog.repository.UserRepository;
 import com.asdf.minilog.security.MinilogUserDetails;
 import com.asdf.minilog.util.EntityDtoMapper;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -65,9 +64,12 @@ public class UserService {
         return EntityDtoMapper.toDto(savedUser);
     }
 
-    public UserResponseDto updateUser(MinilogUserDetails userDetails, Long userId, UserRequestDto userRequestDto) {
+    public UserResponseDto updateUser(
+            MinilogUserDetails userDetails, Long userId, UserRequestDto userRequestDto) {
         if (!userDetails.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals(Role.ROLE_ADMIN.name()))
+                        .anyMatch(
+                                authority ->
+                                        authority.getAuthority().equals(Role.ROLE_ADMIN.name()))
                 && !userDetails.getId().equals(userId)) {
             throw new NotAuthorizedException("권한이 없습니다.");
         }
@@ -104,7 +106,8 @@ public class UserService {
                 .findByUsername(username)
                 .map(EntityDtoMapper::toDto)
                 .orElseThrow(
-                        () -> new UserNotFoundException(
-                                String.format("해당 이름(%s)을 가진 사용자를 찾을 수 없습니다.", username)));
+                        () ->
+                                new UserNotFoundException(
+                                        String.format("해당 이름(%s)을 가진 사용자를 찾을 수 없습니다.", username)));
     }
 }

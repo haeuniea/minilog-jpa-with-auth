@@ -51,7 +51,11 @@ public class JwtUtil implements Serializable {
         Key signingKey =
                 new SecretKeySpec(
                         Base64.getDecoder().decode(secret), SignatureAlgorithm.HS256.getJcaName());
-        return Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -72,7 +76,8 @@ public class JwtUtil implements Serializable {
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_VALIDITY * 1000))
                 .signWith(
                         new SecretKeySpec(
-                                Base64.getDecoder().decode(secret), SignatureAlgorithm.HS256.getJcaName()))
+                                Base64.getDecoder().decode(secret),
+                                SignatureAlgorithm.HS256.getJcaName()))
                 .compact();
     }
 

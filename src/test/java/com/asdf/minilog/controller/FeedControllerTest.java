@@ -27,29 +27,22 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithMockUser(username = "testuser")
 public class FeedControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockitoBean
-    private ArticleService articleService;
+    @MockitoBean private ArticleService articleService;
 
-    @MockitoBean
-    private JwtRequestFilter jwtRequestFilter;
+    @MockitoBean private JwtRequestFilter jwtRequestFilter;
 
-    @MockitoBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @MockitoBean private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @MockitoBean(name = "jpaMappingContext")
     private JpaMetamodelMappingContext jpaMappingContext;
 
-    private LocalDateTime fixtureDateTime =
-            LocalDateTime.of(2025, 1, 1, 0, 0, 0);
+    private LocalDateTime fixtureDateTime = LocalDateTime.of(2025, 1, 1, 0, 0, 0);
 
-    private DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    private String formattedFixtureDateTime =
-            fixtureDateTime.format(formatter);
+    private String formattedFixtureDateTime = fixtureDateTime.format(formatter);
 
     @Test
     public void testGetFeedList() throws Exception {
@@ -65,16 +58,13 @@ public class FeedControllerTest {
         when(articleService.getFeedListByFollowerId(anyLong()))
                 .thenReturn(Collections.singletonList(articleResponseDto));
 
-        mockMvc
-                .perform(get("/api/v2/feed").param("followerId", "1"))
+        mockMvc.perform(get("/api/v2/feed").param("followerId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].articleId").value(1L))
                 .andExpect(jsonPath("$[0].content").value("Test Content"))
                 .andExpect(jsonPath("$[0].authorId").value(1L))
                 .andExpect(jsonPath("$[0].authorName").value("Test User"))
-                .andExpect(
-                        jsonPath("$[0].createdAt")
-                                .value(formattedFixtureDateTime));
+                .andExpect(jsonPath("$[0].createdAt").value(formattedFixtureDateTime));
     }
 }
