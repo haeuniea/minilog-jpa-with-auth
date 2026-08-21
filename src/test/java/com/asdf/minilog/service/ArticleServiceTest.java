@@ -112,12 +112,11 @@ public class ArticleServiceTest {
     @Test
     @Transactional
     void testGetArticleListByUserId() {
-        ArticleResponseDto article =
-                articleService.getArticleListByUserId(user1.getId()).getFirst();
+        ArticleResponseDto article = articleService.getArticleListByUserId(user1.getId()).getFirst();
 
         assertThat(article.getArticleId()).isEqualTo(article1.getId());
         assertThat(article.getContent()).isEqualTo(article1.getContent());
-        assertThat(article.getAuthorId()).isEqualTo(article1.getAuthor().getId());
+        assertThat(article.getAuthorId()).isEqualTo(article1.getId());
         assertThat(article.getAuthorName()).isEqualTo(article1.getAuthor().getUsername());
         assertThat(dateTimeFormatter.format(article.getCreatedAt()))
                 .isEqualTo(dateTimeFormatter.format(article1.getCreatedAt()));
@@ -142,8 +141,8 @@ public class ArticleServiceTest {
     @Transactional
     void testDeleteArticle() {
         assertThat(articleRepository.findAll().size()).isEqualTo(2);
-        Long articleId = article1.getId(); // Adjusted to match the method signature
-        articleService.deleteArticle(articleId);
+        Long userId = article1.getAuthor().getId(); // TODO: Change to use Token to get userId
+        articleService.deleteArticle(userId, article1.getId());
 
         assertThat(articleRepository.findAll().size()).isEqualTo(1);
     }
@@ -151,8 +150,9 @@ public class ArticleServiceTest {
     @Test
     @Transactional
     void testUpdateArticle() {
-        Long articleId = article1.getId(); // Adjusted to match the method signature
-        ArticleResponseDto article = articleService.updateArticle(articleId, "updated article 1");
+        Long userId = article1.getAuthor().getId(); // TODO: Change to use Token to get userId
+        ArticleResponseDto article =
+                articleService.updateArticle(userId, article1.getId(), "updated article 1");
 
         assertThat(article.getArticleId()).isEqualTo(article1.getId());
         assertThat(article.getContent()).isEqualTo("updated article 1");
